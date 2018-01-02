@@ -48,5 +48,5 @@ setup(
     license='CC-BY-SA 4.0',
     author='"Jackson" Ming Hu',
     author_email='huming2207@gmail.com',
-    description=''
+    description='', install_requires=['flask']
 )

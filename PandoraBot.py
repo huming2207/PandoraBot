@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, redirect, send_file
+from flask import *
 from werkzeug.utils import secure_filename
 from threading import Thread
 import os, io
@@ -27,14 +27,15 @@ def get_flashrom_log():
 
             # Stream the file to the client until it ends. When it ends, remove it.
             if "PBT: Flashrom process finished!" in new_line:
-                yield new_line.encode("utf-8")  # Flush the last line
+                yield new_line  # Flush the last line
                 os.remove(Settings.load_settings("flashrom_log_location"))
                 break
 
-            yield new_line.encode("utf-8")
+            # Return the line only if the line is not empty
+            if new_line:
+                yield new_line + "<br>"
 
-    return Response(read_flashrom_log(), mimetype="text/plain",
-                    headers={"Content-Disposition": "inline; filename=flashrom.log"})
+    return Response(stream_with_context(read_flashrom_log()))
 
 
 @app.route("/flashrom_file")

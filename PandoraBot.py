@@ -6,15 +6,15 @@ import os, io
 from ToolRunner import ToolRunner
 from Settings import Settings
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return render_template("index.html")
 
 
-@app.route('/flashrom_status')
+@app.route('/flashrom_log')
 def get_flashrom_log():
     def read_flashrom_log():
 
@@ -38,7 +38,7 @@ def get_flashrom_log():
     return Response(stream_with_context(read_flashrom_log()))
 
 
-@app.route("/flashrom_file")
+@app.route("/flashrom.bin")
 def get_flashrom_cache():
     with open(Settings.load_settings("flashrom_cache_location"), "rb") as cache_file:
         return send_file(io.BytesIO(cache_file.read()),
@@ -49,25 +49,28 @@ def get_flashrom_cache():
 # GET => Read, POST => Write, DELETE => Erase
 @app.route('/flashrom', methods=["GET", "POST", "DELETE"])
 def run_flashrom():
+
     if request.method == "GET":
 
-        flashrom_thread = Thread(target=ToolRunner.start_flashrom,
-                                 args=("read",
-                                         Settings.load_settings("flashrom_cache_location"),
-                                         Settings.load_settings("flashrom_programmer")))
+        if request.args.get("flashrom-mode", default="") == "read":
 
-        flashrom_thread.start()
+            flashrom_thread = Thread(target=ToolRunner.start_flashrom,
+                                     args=("read",
+                                             Settings.load_settings("flashrom_cache_location"),
+                                             Settings.load_settings("flashrom_programmer")))
 
-    elif request.method == "DELETE":
+            flashrom_thread.start()
 
-        flashrom_thread = Thread(target=ToolRunner.start_flashrom,
-                                 args=("erase", "", Settings.load_settings("flashrom_programmer")))
+        elif request.args.get("flashrom-mode", default="") == "erase":
 
-        flashrom_thread.start()
+            flashrom_thread = Thread(target=ToolRunner.start_flashrom,
+                                     args=("erase", "", Settings.load_settings("flashrom_programmer")))
+
+            flashrom_thread.start()
 
     elif request.method == "POST":
 
-        flash_bin = request.files['file']
+        flash_bin = request.files['rom']
         flash_bin.save(os.path.join(Settings.load_settings("flashrom_upload_file_path"),
                                     secure_filename(flash_bin.filename)))
 
@@ -77,7 +80,15 @@ def run_flashrom():
 
         flashrom_thread.start()
 
-    return Response("OK", mimetype="text/plain", status=200)
+    return render_template("flashrom_run.html",
+                           flashrom_read=request.args.get("flashrom-mode", default="") == "read")
+
+
+# Shorten caching timeout to 10 seconds
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 10
+    return response
 
 
 if __name__ == '__main__':

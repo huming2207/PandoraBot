@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EnlightCenter Web</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
+            integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
+          integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+</head>
+<body>
+<div class="ui pointing menu">
+    <a class="item active" href="#flashrom">
+        Overview
+    </a>
+    <a class="item" href="#settings">
+        Settings
+    </a>
+</div>
+<div class="ui text container" >
+    <div class="ui segment" id="flashrom">
+        <h3 class="ui center aligned header">
+            Flash/Write
+        </h3>
+        <form class="ui form" action="/flashrom" method="post" enctype = "multipart/form-data">
+            <div class="field">
+                <label>Choose a binary file: </label>
+                <input name="rom" type="file">
+            </div>
+            <input class="fluid ui button" type="submit">
+        </form>
+        <h3 class="ui center aligned header">
+            Erase
+        </h3>
+        <form class="fluid ui center aligned form" action="/flashrom" method="get">
+            <input type="hidden" name="flashrom-mode" value="erase">
+            <button class="fluid ui center aligned button" type="submit">Erase the flash</button>
+        </form>
+        <h3 class="fluid ui center aligned header">
+            Read
+        </h3>
+        <form class="ui center aligned form" action="/flashrom" method="get">
+            <input type="hidden" name="flashrom-mode" value="read">
+            <button class="fluid ui center aligned button" type="submit">Read from flash</button>
+        </form>
+    </div>
+
+
+    <div class="ui segment">
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlashROM is running...</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
+            integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
+          integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+    <style>
+        h1.ui.center.header {
+            margin-top: 3em;
+        }
+    </style>
+</head>
+<body>
+<div class="ui text container">
+    <h1 class="ui center aligned header">Log output</h1>
+    <div class="ui segment">
+        {% if flashrom_read %}
+            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
+                onload="
+                            alert('Done!');
+                            window.location.replace('/');
+                        ">
+
+            </iframe>
+        {% else %}
+            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
+                onload="
+                            // Download the file
+                            var iframe = document.createElement('iframe');
+                            iframe.style.display = 'none';
+                            iframe.src = '/flashrom.bin';
+                            document.body.appendChild(iframe);
+
+                            // Return to home page
+                            alert('Done!');
+                            window.location.replace('/');
+                        ">
+            </iframe>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

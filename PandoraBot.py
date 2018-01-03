@@ -97,22 +97,30 @@ def run_flashrom():
                            flashrom_read=request.args.get("flashrom-mode", default="") == "read")
 
 
-@app.route("/openocd", methods=["POST"])
+@app.route("/openocd", methods=["POST", "GET"])
 def run_openocd():
 
-    print(request.files["config"])
+    if request.method == "POST":
 
-    file_list = []
+        file_list = []
 
-    for ocd_config in request.files.getlist('config'):
-        ocd_config.save(os.path.join(Settings.get("ocd_config_location"), secure_filename(ocd_config.filename)))
-        file_list.append(os.path.join(Settings.get("ocd_config_location"), secure_filename(ocd_config.filename)))
+        for ocd_config in request.files.getlist('config'):
+            ocd_config.save(os.path.join(Settings.get("ocd_config_location"), secure_filename(ocd_config.filename)))
+            file_list.append(os.path.join(Settings.get("ocd_config_location"), secure_filename(ocd_config.filename)))
 
-    ocd_thread = Thread(target=ToolRunner.start_openocd, args=(file_list, True))
+        ocd_thread = Thread(target=ToolRunner.start_openocd, args=(file_list, True))
 
-    ocd_thread.start()
+        ocd_thread.start()
 
-    return render_template("ocd_run.html")
+        return render_template("ocd_run.html")
+
+    elif request.method == "GET" and request.args.get("ocd-cmd", default="") == "kill":
+
+        ToolRunner.kill_process("openocd")
+        return Response(
+            status=200,
+            content_type="text/html",
+            response="<script>alert('OpenOCD has been terminated.'); window.location.replace('/');</script>")
 
 
 # Shorten caching timeout to 10 seconds

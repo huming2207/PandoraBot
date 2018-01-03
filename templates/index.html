@@ -56,13 +56,25 @@
         <h1 class="ui center aligned header">
             On-chip Debugger
         </h1>
-        <div class="ui divider"></div>
+        <div class="ui horizontal divider">
+            Start
+        </div>
         <form class="ui center aligned form" action="/openocd" method="post" enctype="multipart/form-data">
             <div class="field">
                 <label>Choose some configuration files: </label>
                 <input name="config" type="file" multiple>
             </div>
             <input class="fluid ui button" type="submit">
+        </form>
+        <div class="ui horizontal divider">
+            Stop
+        </div>
+        <form class="ui center aligned form" action="/openocd" method="get" enctype="multipart/form-data">
+            <div class="field">
+                <input name="ocd-cmd" type="hidden" value="kill">
+                <input class="fluid ui button" type="submit" value="Terminate OpenOCD">
+            </div>
+
         </form>
     </div>
 </div>

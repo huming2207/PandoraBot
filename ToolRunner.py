@@ -57,3 +57,8 @@ class ToolRunner:
         ocd_log_opt.write("\nPBT: OpenOCD process finished!\n")
         ocd_log_opt.flush()
         ocd_log_opt.close()
+
+    @staticmethod
+    def kill_process(process_name):
+        process = subprocess.Popen(["killall", "-9", str(process_name)])
+        process.wait()

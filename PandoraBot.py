@@ -46,10 +46,11 @@ def get_flashrom_cache():
                          attachment_filename="flash_dump.bin")
 
 
-# GET => Read, POST => Write, DELETE => Erase
-@app.route('/flashrom', methods=["GET", "POST", "DELETE"])
+# GET => Read, POST => Write
+@app.route('/flashrom', methods=["GET", "POST"])
 def run_flashrom():
 
+    # Erase/Read with GET
     if request.method == "GET":
 
         if request.args.get("flashrom-mode", default="") == "read":
@@ -68,6 +69,7 @@ def run_flashrom():
 
             flashrom_thread.start()
 
+    # Write (Flash) with POST
     elif request.method == "POST":
 
         flash_bin = request.files['rom']

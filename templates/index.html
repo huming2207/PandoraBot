@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EnlightCenter Web</title>
+    <title>PandoraBot Portal</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
@@ -13,18 +13,22 @@
 <body>
 <div class="ui pointing menu">
     <a class="item active" href="#flashrom">
-        Overview
+        SPI Flash tool
     </a>
-    <a class="item" href="#settings">
-        Settings
+    <a class="item" href="#ocd">
+        On-chip Debugger
     </a>
 </div>
-<div class="ui text container" >
+<div class="ui text container">
     <div class="ui segment" id="flashrom">
+        <h1 class="ui center aligned header">
+            SPI Flash tools
+        </h1>
+        <div class="ui divider"></div>
         <h3 class="ui center aligned header">
             Flash/Write
         </h3>
-        <form class="ui form" action="/flashrom" method="post" enctype = "multipart/form-data">
+        <form class="ui form" action="/flashrom" method="post" enctype="multipart/form-data">
             <div class="field">
                 <label>Choose a binary file: </label>
                 <input name="rom" type="file">
@@ -48,8 +52,18 @@
     </div>
 
 
-    <div class="ui segment">
-
+    <div class="ui segment" id="ocd">
+        <h1 class="ui center aligned header">
+            On-chip Debugger
+        </h1>
+        <div class="ui divider"></div>
+        <form class="ui center aligned form" action="/openocd" method="post" enctype="multipart/form-data">
+            <div class="field">
+                <label>Choose some configuration files: </label>
+                <input name="config" type="file" multiple>
+            </div>
+            <input class="fluid ui button" type="submit">
+        </form>
     </div>
 </div>
 </body>

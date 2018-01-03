@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FlashROM is running...</title>
+    <title>Launching OpenOCD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
@@ -11,33 +11,16 @@
           integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
 </head>
 <body>
-<div class="ui text container">
-    <div class="ui segment">
+<div class="ui container">
+    <div class="ui segment" id="content" style="margin-top: 50px;">
         <h1 class="ui center aligned header">Log output</h1>
         <div class="ui divider"></div>
-        {% if flashrom_read %}
-            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                onload="
+        <iframe width="850px" height="500px" src="/ocd_log" onload="
                             alert('Done!');
                             window.location.replace('/');
                         ">
 
-            </iframe>
-        {% else %}
-            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                onload="
-                            // Download the file
-                            var iframe = document.createElement('iframe');
-                            iframe.style.display = 'none';
-                            iframe.src = '/flashrom.bin';
-                            document.body.appendChild(iframe);
-
-                            // Return to home page
-                            alert('Done!');
-                            window.location.replace('/');
-                        ">
-            </iframe>
-        {% endif %}
+        </iframe>
     </div>
 </div>
 </body>

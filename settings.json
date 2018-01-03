@@ -2,5 +2,7 @@
    "flashrom_cache_location":"/tmp/pbt/flash.bin",
    "flashrom_upload_file_path":"/tmp/pbt",
    "flashrom_programmer":"ft2232_spi:type=2232H,port=A",
-   "flashrom_log_location":"/tmp/pbt/pbt_flashrom.log"
+   "flashrom_log_location":"/tmp/pbt/pbt_flashrom.log",
+   "ocd_log_location":"/tmp/pbt/pbt_ocd.log",
+   "ocd_config_location":"/tmp/pbt/ocd"
 }

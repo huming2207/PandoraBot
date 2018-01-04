@@ -12,71 +12,132 @@
 </head>
 <body>
 <div class="ui pointing menu">
-    <a class="item active" href="#flashrom">
-        SPI Flash tool
-    </a>
-    <a class="item" href="#ocd">
-        On-chip Debugger
-    </a>
-</div>
-<div class="ui text container">
-    <div class="ui segment" id="flashrom">
-        <h1 class="ui center aligned header">
-            SPI Flash tools
-        </h1>
-        <div class="ui divider"></div>
-        <h3 class="ui center aligned header">
-            Flash/Write
-        </h3>
-        <form class="ui form" action="/flashrom" method="post" enctype="multipart/form-data">
-            <div class="field">
-                <label>Choose a binary file: </label>
-                <input name="rom" type="file">
-            </div>
-            <input class="fluid ui button" type="submit">
-        </form>
-        <h3 class="ui center aligned header">
-            Erase
-        </h3>
-        <form class="fluid ui center aligned form" action="/flashrom" method="get">
-            <input type="hidden" name="flashrom-mode" value="erase">
-            <button class="fluid ui center aligned button" type="submit">Erase the flash</button>
-        </form>
-        <h3 class="fluid ui center aligned header">
-            Read
-        </h3>
-        <form class="ui center aligned form" action="/flashrom" method="get">
-            <input type="hidden" name="flashrom-mode" value="read">
-            <button class="fluid ui center aligned button" type="submit">Read from flash</button>
-        </form>
-    </div>
-
-
-    <div class="ui segment" id="ocd">
-        <h1 class="ui center aligned header">
-            On-chip Debugger
-        </h1>
-        <div class="ui horizontal divider">
-            Start
-        </div>
-        <form class="ui center aligned form" action="/openocd" method="post" enctype="multipart/form-data">
-            <div class="field">
-                <label>Choose some configuration files: </label>
-                <input name="config" type="file" multiple>
-            </div>
-            <input class="fluid ui button" type="submit">
-        </form>
-        <div class="ui horizontal divider">
-            Stop
-        </div>
-        <form class="ui center aligned form" action="/openocd" method="get" enctype="multipart/form-data">
-            <div class="field">
-                <input name="ocd-cmd" type="hidden" value="kill">
-                <input class="fluid ui button" type="submit" value="Terminate OpenOCD">
-            </div>
-
-        </form>
+    <div class="header item">
+        PandoraBot Portal
     </div>
 </div>
+<div class="ui container">
+    <div class="ui three column grid">
+        <div class="column" id="flashrom">
+            <div class="ui segment">
+                <h1 class="ui center aligned header">
+                    SPI Flash tools
+                </h1>
+                <div class="ui horizontal divider">
+                    Flash/Write
+                </div>
+                <form class="ui form" action="/flashrom" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <label>Choose a binary file: </label>
+                        <input name="rom" type="file">
+                    </div>
+                    <input class="fluid ui button" type="submit">
+                </form>
+                <div class="ui horizontal divider">
+                    Erase
+                </div>
+                <form class="fluid ui center aligned form" action="/flashrom" method="get">
+                    <input type="hidden" name="flashrom-mode" value="erase">
+                    <button class="fluid ui center aligned button" type="submit">Erase the flash</button>
+                </form>
+                <div class="ui horizontal divider">
+                    Read
+                </div>
+                <form class="ui center aligned form" action="/flashrom" method="get">
+                    <input type="hidden" name="flashrom-mode" value="read">
+                    <button class="fluid ui center aligned button" type="submit">Read from flash</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="column" id="ocd">
+            <div class="ui segment">
+                <h1 class="ui center aligned header">
+                    On-chip Debugger
+                </h1>
+                <div class="ui horizontal divider">
+                    Start
+                </div>
+                <form class="ui center aligned form" action="/openocd" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <label>Choose some configuration files: </label>
+                        <input name="config" type="file" multiple>
+                    </div>
+                    <input class="fluid ui button" type="submit">
+                </form>
+                <div class="ui horizontal divider">
+                    Stop
+                </div>
+                <form class="ui center aligned form" action="/openocd" method="get" enctype="multipart/form-data">
+                    <div class="field">
+                        <input name="ocd-cmd" type="hidden" value="kill">
+                        <input class="fluid ui button" type="submit" value="Terminate OpenOCD">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="column" id="uart">
+            <div class="ui segment">
+                <h1 class="ui center aligned header">
+                    UART Serial Tool
+                </h1>
+                <div class="ui horizontal divider">
+                    Start
+                </div>
+                <form class="ui equal width form" action="/uart">
+                    <div class="field">
+                        <div class="ui labeled input">
+                            <div class="ui label">
+                                Baud rate
+                            </div>
+                            <input type="text" name="baud" value="115200" class="">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui labeled input">
+                            <div class="ui label">
+                                Data bit
+                            </div>
+                            <input type="text" name="data" value="8" class="">
+                        </div>
+                    </div>
+                    <div class="fields">
+                        <div class="field">
+                            <select name="parity" title="Parity bit">
+                                <option value="n">No parity bit</option>
+                                <option value="e">Even parity bit</option>
+                                <option value="o">Odd parity bit</option>
+                            </select>
+                        </div>
+                        <div class="field" title="Flow control">
+                            <select name="flow">
+                                <option value="n">No flow control</option>
+                                <option value="s">Soft flow control</option>
+                                <option value="h">Hard flow control</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fields">
+                        <div class="field">
+                            <input class="fluid ui button" type="submit" value="Start">
+                        </div>
+                    </div>
+                </form>
+                <div class="ui horizontal divider">
+                    Stop
+                </div>
+                <form class="ui equal width form" action="/uart">
+                    <div class="field">
+                        <input name="uart-cmd" type="hidden" value="kill">
+                        <input class="fluid ui button" type="submit" value="Terminate">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

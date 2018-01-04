@@ -2,6 +2,7 @@ from flask import *
 from werkzeug.utils import secure_filename
 from threading import Thread
 import os, io
+import re
 
 from ToolRunner import ToolRunner
 from Settings import Settings
@@ -99,7 +100,6 @@ def run_flashrom():
 
 @app.route("/openocd", methods=["POST", "GET"])
 def run_openocd():
-
     if request.method == "POST":
 
         file_list = []
@@ -122,6 +122,35 @@ def run_openocd():
             content_type="text/html",
             response="<script>alert('OpenOCD has been terminated.'); window.location.replace('/');</script>")
 
+
+@app.route("/uart", methods=["GET"])
+def run_uart():
+
+    if request.args.get("uart-cmd", default="") == "kill":
+        ToolRunner.kill_process("ttyd")
+        return Response(
+            status=200,
+            content_type="text/html",
+            response="<script>alert('ttyd has been terminated.'); window.location.replace('/');</script>")
+    else:
+        data = str(request.args.get("data", default=""))
+        parity = str(request.args.get("parity", default=""))
+        flow = str(request.args.get("flow", default=""))
+        baud = str(request.args.get("baud", default=""))
+
+        # If any of these parameters contain some illegal chars (e.g. '&' and ';'), it should be intercepted.
+        if not data.isalnum() or not parity.isalnum() or not flow.isalnum() or not baud.isalnum():
+            return Response(status=400,
+                            content_type="text/html",
+                            response="<script>alert('Parameter is corrupted'); window.location.replace('/');</script>")
+
+        # Start the thread
+        ttyd_thread = Thread(target=ToolRunner.start_ttyd, args=(baud, data, flow, parity))
+        ttyd_thread.start()
+
+        return Response(status=200,
+                    content_type="text/html",
+                    response="<script>window.location.replace('http://' + window.location.hostname + ':9527');</script>")
 
 # Shorten caching timeout to 10 seconds
 @app.after_request

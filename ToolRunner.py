@@ -56,9 +56,30 @@ class ToolRunner:
 
         ocd_log_opt.write("\nPBT: OpenOCD process finished!\n")
         ocd_log_opt.flush()
-        ocd_log_opt.close()
 
     @staticmethod
     def kill_process(process_name):
         process = subprocess.Popen(["killall", "-9", str(process_name)])
+        process.wait()
+
+
+    @staticmethod
+    def start_ttyd(baud, data, flow, parity):
+
+        ttyd_cmd_list = ["ttyd", "-p", Settings.get("ttyd_port")]
+
+        picocom_cmd_list = ["picocom",
+                            "-b", str(baud),
+                            "-d", str(data),
+                            "-f", str(flow),
+                            "-p", str(parity),
+                            Settings.get("picocom_tty_device")]
+
+        # Merge picocom command into original list
+        ttyd_cmd_list.extend(picocom_cmd_list)
+
+        ttyd_log_opt = open(Settings.get("ttyd_log_location"), "w+")
+
+        process = subprocess.Popen(args=ttyd_cmd_list, stdout=ttyd_log_opt, stderr=ttyd_log_opt)
+
         process.wait()

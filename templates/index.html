@@ -5,10 +5,8 @@
     <title>PandoraBot Portal</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
-            integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
-          integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+    <script src="res/js/semantic.min.js"></script>
+    <link rel="stylesheet" href="res/css/semantic.min.css"/>
 </head>
 <body>
 <div class="ui pointing menu">
@@ -92,7 +90,7 @@
                             <div class="ui label">
                                 Baud rate
                             </div>
-                            <input type="text" name="baud" value="115200" class="">
+                            <input type="text" name="baud" value="115200">
                         </div>
                     </div>
                     <div class="field">
@@ -100,7 +98,7 @@
                             <div class="ui label">
                                 Data bit
                             </div>
-                            <input type="text" name="data" value="8" class="">
+                            <input type="text" name="data" value="8">
                         </div>
                     </div>
                     <div class="fields">
@@ -112,7 +110,7 @@
                             </select>
                         </div>
                         <div class="field" title="Flow control">
-                            <select name="flow">
+                            <select name="flow" title="Flow control">
                                 <option value="n">No flow control</option>
                                 <option value="s">Soft flow control</option>
                                 <option value="h">Hard flow control</option>

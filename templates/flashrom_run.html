@@ -9,15 +9,32 @@
             integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
           integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
+    <script src="res/js/progress.js"></script>
 </head>
 <body>
 <div class="ui text container">
     <div class="ui segment">
-        <h1 class="ui center aligned header">Log output</h1>
-        <div class="ui divider"></div>
+        <h1 class="ui header">
+            FlashROM is working...
+        </h1>
+        {% if not flashrom_read %}
+            <div class="ui horizontal divider">
+                Progress
+            </div>
+            <div class="ui segment" onload="init_progress()">
+                <div class="ui active dimmer">
+                    <div class="ui text loader" id="progress_indicator">Status unknown, check the log...</div>
+                </div>
+                <p></p>
+            </div>
+        {% endif %}
+
+        <div class="ui horizontal divider">
+            Log output
+        </div>
         {% if flashrom_read %}
             <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                onload="
+                    onload="
                             alert('Done!');
                             window.location.replace('/');
                         ">
@@ -25,7 +42,7 @@
             </iframe>
         {% else %}
             <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                onload="
+                    onload="
                             // Download the file
                             var iframe = document.createElement('iframe');
                             iframe.style.display = 'none';

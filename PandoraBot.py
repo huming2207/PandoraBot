@@ -2,34 +2,13 @@ from flask import *
 from werkzeug.utils import secure_filename
 from threading import Thread
 import os, io
-import re
 
 from ToolRunner import ToolRunner
 from Settings import Settings
+from LogHelpers import  LogHelpers
 
 app = Flask(__name__, template_folder="templates")
-
-
-def read_log(log_file_path, delete=False, end_line="process finished"):
-    # Try load log files
-    log_file = open(log_file_path, "r")
-
-    # Stream file to the client
-    while True:
-        new_line = log_file.readline()
-
-        # Stream the file to the client until it ends. When it ends, remove it.
-        if end_line in new_line:
-            yield new_line  # Flush the last line
-
-            if delete:
-                os.remove(log_file_path)
-
-            break
-
-        # Return the line only if the line is not empty
-        if new_line:
-            yield new_line + "<br>"
+log_helper = LogHelpers()
 
 
 @app.route('/')
@@ -37,18 +16,25 @@ def render_index():
     return render_template("index.html")
 
 
-@app.route('/flashrom_log')
+@app.route('/stream_flashrom_log')
 def get_flashrom_log():
     return Response(
-        stream_with_context(read_log(Settings.get("flashrom_log_location"),
-                                     delete=True, end_line="PBT: Flashrom process finished!")))
+        stream_with_context(log_helper.stream_log(log_file=open(Settings.get("flashrom_log_location"), "r"),
+                                                  delete=False, end_line="PBT: Flashrom process finished!")))
 
 
-@app.route('/ocd_log')
+@app.route('/flashrom_progress')
+def get_flashrom_status():
+    return jsonify(progress=log_helper.flashrom_percentage,
+                   addr_start=log_helper.flashrom_addr_start,
+                   addr_end=log_helper.flashrom_addr_end)
+
+
+@app.route('/stream_ocd_log')
 def get_ocd_log():
     return Response(
-        stream_with_context(read_log(Settings.get("ocd_log_location"),
-                                     delete=True, end_line="PBT: OpenOCD process finished!")))
+        stream_with_context(log_helper.stream_log(log_file=open(Settings.get("flashrom_log_location"), "r"),
+                                                  delete=False, end_line="PBT: OpenOCD process finished!")))
 
 
 @app.route("/flashrom.bin")
@@ -59,7 +45,7 @@ def get_flashrom_cache():
                          attachment_filename="flash_dump.bin")
 
 
-# GET => Read, POST => Write
+# GET => Read/Erase, POST => Write
 @app.route('/flashrom', methods=["GET", "POST"])
 def run_flashrom():
     # Erase/Read with GET
@@ -125,7 +111,6 @@ def run_openocd():
 
 @app.route("/uart", methods=["GET"])
 def run_uart():
-
     if request.args.get("uart-cmd", default="") == "kill":
         ToolRunner.kill_process("ttyd")
         return Response(
@@ -149,8 +134,9 @@ def run_uart():
         ttyd_thread.start()
 
         return Response(status=200,
-                    content_type="text/html",
-                    response="<script>window.location.replace('http://' + window.location.hostname + ':9527');</script>")
+                content_type="text/html",
+                response="<script>window.location.replace('http://' + window.location.hostname + ':9527');</script>")
+
 
 # Shorten caching timeout to 10 seconds
 @app.after_request
@@ -160,4 +146,4 @@ def add_header(response):
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(host="0.0.0.0")

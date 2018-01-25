@@ -23,11 +23,11 @@ class LogHelpers:
             # ref: https://github.com/huming2207/flashrom_google/blob/master/flashrom.c#L1575
             if new_line[0].isdigit() and ", " in new_line:
 
-                progress_details = re.split(" %, | to ", new_line)
+                progress_details = re.split(": | %, | to ", new_line)
 
-                self.flashrom_percentage = str(progress_details[0])
-                self.flashrom_addr_start = str(progress_details[1])
-                self.flashrom_addr_end = str(progress_details[2])
+                self.flashrom_percentage = str(progress_details[1])
+                self.flashrom_addr_start = str(progress_details[2])
+                self.flashrom_addr_end = str(progress_details[3])
 
             # Stream the file to the client until it ends. When it ends, remove it.
             if end_line in new_line:

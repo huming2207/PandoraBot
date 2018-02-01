@@ -26,6 +26,4 @@ It handles user's request via a simple web UI, and then calling some tools direc
 
 # To-do
 
-- Basic CI Test
-    - GPIO handling (key press simulations, etc.)
 - Espressif tools support (esptool + espotatool)

@@ -11,8 +11,74 @@
           integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
 </head>
 <body>
-    <div>
-
+<div class="ui pointing menu">
+    <div class="header item">
+        Pandorabot hardware test
     </div>
+</div>
+<div class="ui container">
+    <div class="ui two column grid">
+        <div class="column" id="gpio_in">
+            <div class="ui segment">
+                <h1 class="ui center aligned header">
+                    GPIO Write
+                </h1>
+                <form class="ui form" action="#" method="post" enctype="multipart/form-data">
+                    <div class="equal width fields">
+                        <div class="field">
+                            <label>Choose a GPIO pin: </label>
+                            <select name="pin">
+                                <option value="0">Pin 0</option>
+                                <option value="39">Pin 39</option>
+                                <option value="40">Pin 40</option>
+                                <option value="41">Pin 41</option>
+                                <option value="42">Pin 42</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Level</label>
+                            <select name="pin">
+                                <option value="0">Low</option>
+                                <option value="1">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ui submit button">Go</div>
+                </form>
+            </div>
+        </div>
+        <div class="column" id="gpio_out">
+            <div class="ui segment">
+                <h1 class="ui center aligned header">
+                    GPIO Read
+                </h1>
+                <h4 class="ui horizontal divider header">
+                    <i class="checked calendar icon"></i>
+                    Result
+                </h4>
+                <h2 id="gpio-value" style="text-align: center">
+                    Unknown
+                </h2>
+                <h4 class="ui horizontal divider header">
+                    <i class="settings icon"></i>
+                    Configuration
+                </h4>
+                <form class="ui form" action="#" method="post" enctype="multipart/form-data">
+                    <div class="field">
+                        <label>Choose a GPIO pin: </label>
+                        <select name="pin">
+                            <option value="0">Pin 0</option>
+                            <option value="39">Pin 39</option>
+                            <option value="40">Pin 40</option>
+                            <option value="41">Pin 41</option>
+                            <option value="42">Pin 42</option>
+                        </select>
+                    </div>
+                    <div class="ui submit button">Go</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

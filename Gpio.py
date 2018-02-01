@@ -83,7 +83,6 @@ class Gpio:
 
         return int(result)
 
-
     @staticmethod
     def __is_valid_gpio(path):
 

@@ -3,9 +3,10 @@ from werkzeug.utils import secure_filename
 from threading import Thread
 import os, io
 
+from Gpio import Gpio
 from ToolRunner import ToolRunner
 from Settings import Settings
-from LogHelpers import  LogHelpers
+from LogHelpers import LogHelpers
 
 app = Flask(__name__, template_folder="templates")
 log_helper = LogHelpers()
@@ -133,9 +134,67 @@ def run_uart():
         ttyd_thread = Thread(target=ToolRunner.start_ttyd, args=(baud, data, flow, parity))
         ttyd_thread.start()
 
-        return Response(status=200,
-                content_type="text/html",
-                response="<script>window.location.replace('http://' + window.location.hostname + ':9527');</script>")
+        return Response(status=200, content_type="text/html",
+                        response="<script>window.location.replace('http://' + window.location.hostname + "
+                                 "':9527');</script>")
+
+
+@app.route("/gpio_out", methods=["GET"])
+def handle_gpio_out():
+
+    # Pin selection
+    if not str(request.args.get("pin", default="")).isdigit():
+        return Response(status=400, content_type="text/plain", response="Bad Request, pin argument is not even a number")
+
+    selected_pin = int(request.args.get("pin"))
+
+    # FIXME: use regexp later
+    # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
+    if not selected_pin == 0 or not 39 <= selected_pin <= 42:
+        return Response(status=400, content_type="text/plain", response="Bad Request: not a valid pin number")
+
+    # Value selection
+    if not str(request.args.get("value")).isdigit():
+        return Response(status=400, content_type="text/plain", response="Bad Request: mode selection incorrect")
+
+    value = int(request.args.get("value", default="-1"))
+
+    # If all good, then...
+    gpio = Gpio(selected_pin)
+
+    if gpio.set_mode("out") and gpio.set_value(value):
+        return Response(status=200, content_type="text/plain", response="OK")
+    else:
+        return Response(status=500, content_type="text/plain", response="Internal Error: check dmesg log please")
+
+
+@app.route("/gpio_in", methods=["GET"])
+def handle_gpio_in():
+    # Pin selection
+    if not str(request.args.get("pin", default="")).isdigit():
+        return Response(status=400, content_type="text/plain",
+                        response="Bad Request, pin argument is not even a number")
+
+    selected_pin = int(request.args.get("pin"))
+
+    # FIXME: use regexp later
+    # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
+    if not selected_pin == 0 or not 39 <= selected_pin <= 42:
+        return Response(status=400, content_type="text/plain", response="Bad Request: not a valid pin number")
+
+    # If all good, then...
+    gpio = Gpio(selected_pin)
+
+    if gpio.set_mode("in"):
+        gpio_value = gpio.get_value()
+
+        if gpio_value == -1:
+            return Response(status=400, content_type="text/plain", response="Bad Request: cannot retrieve value")
+        else:
+            return Response(status=200, content_type="text/plain", response=str(gpio_value))
+
+    else:
+        return Response(status=500, content_type="text/plain", response="Internal Error: check dmesg log please")
 
 
 # Shorten caching timeout to 10 seconds

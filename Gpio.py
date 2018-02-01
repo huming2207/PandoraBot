@@ -3,7 +3,7 @@ from pathlib import Path
 
 class Gpio:
 
-    def __init__(self, selected_pin, mode):
+    def __init__(self, selected_pin):
 
         self.pin = str(selected_pin)
         fp = open("/sys/class/gpio/export", "w+")
@@ -65,6 +65,24 @@ class Gpio:
         fp.flush()
         fp.close()
         return True
+
+    def get_value(self):
+
+        # Pick node name "value" to set the high/low value
+        sysfs_path = self.__get_sysfs_path("value")
+
+        if self.__is_valid_gpio(sysfs_path):
+            return False
+
+        # Open the node
+        result = Path(self.__get_sysfs_path("value")).read_text()
+
+        # Get the value, if incorrect then return -1
+        if str(result).isdigit():
+            return -1
+
+        return int(result)
+
 
     @staticmethod
     def __is_valid_gpio(path):

@@ -1,7 +1,7 @@
 from flask import *
 from werkzeug.utils import secure_filename
 from threading import Thread
-import os, io
+import os, io, logging
 
 from Gpio import Gpio
 from ToolRunner import ToolRunner
@@ -85,6 +85,11 @@ def run_flashrom():
                            flashrom_read=request.args.get("flashrom-mode", default="") == "read")
 
 
+@app.route("/hardware", methods=["GET"])
+def get_hardware_page():
+    return render_template("hardware.html")
+
+
 @app.route("/openocd", methods=["POST", "GET"])
 def run_openocd():
     if request.method == "POST":
@@ -144,28 +149,42 @@ def handle_gpio_out():
 
     # Pin selection
     if not str(request.args.get("pin", default="")).isdigit():
-        return Response(status=400, content_type="text/plain", response="Bad Request, pin argument is not even a number")
+        return Response(status=400,
+                        content_type="text/plain",
+                        response="Bad Request, pin argument is not even a number")
 
     selected_pin = int(request.args.get("pin"))
 
     # FIXME: use regexp later
     # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
-    if not selected_pin == 0 or not 39 <= selected_pin <= 42:
-        return Response(status=400, content_type="text/plain", response="Bad Request: not a valid pin number")
+    if not selected_pin == 0 and not 39 <= selected_pin <= 42:
+        return Response(status=400,
+                        content_type="text/plain",
+                        response="Bad Request: not a valid pin number")
 
     # Value selection
     if not str(request.args.get("value")).isdigit():
-        return Response(status=400, content_type="text/plain", response="Bad Request: mode selection incorrect")
+        return Response(status=400,
+                        content_type="text/plain",
+                        response="Bad Request: value selection incorrect")
 
     value = int(request.args.get("value", default="-1"))
 
     # If all good, then...
-    gpio = Gpio(selected_pin)
+    gpio = Gpio(selected_pin, app)
 
-    if gpio.set_mode("out") and gpio.set_value(value):
-        return Response(status=200, content_type="text/plain", response="OK")
-    else:
-        return Response(status=500, content_type="text/plain", response="Internal Error: check dmesg log please")
+    if not gpio.set_mode("out"):
+        return Response(status=500,
+                        content_type="text/plain",
+                        response="Internal Error: set mode failed, check dmesg log please")
+
+    if not gpio.set_value(value):
+        return Response(status=500,
+                        content_type="text/plain",
+                        response="Internal Error: set value failed, check dmesg log please")
+
+    return Response(status=200, content_type="text/plain", response="OK")
+
 
 
 @app.route("/gpio_in", methods=["GET"])
@@ -179,22 +198,24 @@ def handle_gpio_in():
 
     # FIXME: use regexp later
     # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
-    if not selected_pin == 0 or not 39 <= selected_pin <= 42:
+    if not selected_pin == 0 and not 39 <= selected_pin <= 42:
         return Response(status=400, content_type="text/plain", response="Bad Request: not a valid pin number")
 
     # If all good, then...
-    gpio = Gpio(selected_pin)
+    gpio = Gpio(selected_pin, app)
 
-    if gpio.set_mode("in"):
-        gpio_value = gpio.get_value()
+    if not gpio.set_mode("in"):
 
-        if gpio_value == -1:
+        return Response(status=500,
+                        content_type="text/plain",
+                        response="Internal Error: set mode failed, check dmesg log please")
+
+    gpio_value = gpio.get_value()
+
+    if gpio_value == -1:
             return Response(status=400, content_type="text/plain", response="Bad Request: cannot retrieve value")
-        else:
-            return Response(status=200, content_type="text/plain", response=str(gpio_value))
-
     else:
-        return Response(status=500, content_type="text/plain", response="Internal Error: check dmesg log please")
+        return Response(status=200, content_type="text/plain", response=str(gpio_value))
 
 
 # Shorten caching timeout to 10 seconds
@@ -205,4 +226,5 @@ def add_header(response):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     app.run(host="0.0.0.0")

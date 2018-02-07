@@ -9,7 +9,8 @@
             integrity="sha256-Bhi6GMQ/72uYZcJXCJ2LToOIcN3+Cx47AZnq/Bw1f7A=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
           integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
-    <script src="res/js/progress.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="res/js/common.js"></script>
 </head>
 <body>
 <div class="ui text container">
@@ -33,26 +34,10 @@
             Log output
         </div>
         {% if flashrom_read %}
-            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                    onload="
-                            alert('Done!');
-                            window.location.replace('/');
-                        ">
-
+            <iframe sandbox width="650px" height="500px" src="/flashrom_log" onload="after_operation(true)">
             </iframe>
         {% else %}
-            <iframe sandbox width="650px" height="500px" src="/flashrom_log"
-                    onload="
-                            // Download the file
-                            var iframe = document.createElement('iframe');
-                            iframe.style.display = 'none';
-                            iframe.src = '/flashrom.bin';
-                            document.body.appendChild(iframe);
-
-                            // Return to home page
-                            alert('Done!');
-                            window.location.replace('/');
-                        ">
+            <iframe sandbox width="650px" height="500px" src="/flashrom_log" onload="after_operation(false);">
             </iframe>
         {% endif %}
     </div>

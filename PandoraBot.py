@@ -124,17 +124,13 @@ def run_uart():
 
         # If any of these parameters contain some illegal chars (e.g. '&' and ';'), it should be intercepted.
         if not data.isalnum() or not parity.isalnum() or not flow.isalnum() or not baud.isalnum():
-            return Response(status=400,
-                            content_type="text/html",
-                            response="<script>alert('Parameter is corrupted'); window.location.replace('/');</script>")
+            return jsonify(status="PARAM_ERR", message="Parameter is corrupted")
 
         # Start the thread
         ttyd_thread = Thread(target=ToolRunner.start_ttyd, args=(baud, data, flow, parity))
         ttyd_thread.start()
 
-        return Response(status=200, content_type="text/html",
-                        response="<script>window.location.replace('http://' + window.location.hostname + "
-                                 "':9527');</script>")
+        return jsonify(status="OK", message="OK")
 
 
 @app.route("/gpio_out", methods=["GET"])

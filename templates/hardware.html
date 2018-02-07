@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Hardware testing</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
           integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous"/>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="res/js/hardware.js"></script>
 </head>
 <body>
 <div class="ui pointing menu">
@@ -17,18 +19,30 @@
         Pandorabot hardware test
     </div>
 </div>
-<div class="ui container">
+<div class="ui container" id="gpio">
     <div class="ui two column grid">
-        <div class="column" id="gpio_in">
+        <div class="column">
             <div class="ui segment">
                 <h1 class="ui center aligned header">
                     GPIO Write
                 </h1>
-                <form class="ui form" action="/gpio_out" method="get" enctype="multipart/form-data">
+                <h4 class="ui horizontal divider header">
+                    <i class="checked calendar icon"></i>
+                    Result
+                </h4>
+                <h2 id="gpio-result" style="text-align: center">
+                    {{ result }}
+                </h2>
+                <h4 class="ui horizontal divider header">
+                    <i class="settings icon"></i>
+                    Configuration
+                </h4>
+                <form class="ui form" action="#" method="get" enctype="multipart/form-data">
                     <div class="equal width fields">
                         <div class="field">
                             <label>Choose a GPIO pin: </label>
-                            <select name="pin">
+                            <select name="pin" v-model="pin">
+                                <option disabled value="">Pick a pin</option>
                                 <option value="0">Pin 0</option>
                                 <option value="39">Pin 39</option>
                                 <option value="40">Pin 40</option>
@@ -38,17 +52,20 @@
                         </div>
                         <div class="field">
                             <label>Level</label>
-                            <select name="value">
+                            <select name="value" v-model="newValue">
+                                <option disabled value="">Pick a level</option>
                                 <option value="0">Low</option>
                                 <option value="1">High</option>
                             </select>
                         </div>
                     </div>
-                    <input type="submit" value="Go">
+                    <div class="field">
+                        <input class="fluid ui button" type="submit" value="Go" v-on:click="gpioSet">
+                    </div>
                 </form>
             </div>
         </div>
-        <div class="column" id="gpio_out">
+        <div class="column">
             <div class="ui segment">
                 <h1 class="ui center aligned header">
                     GPIO Read
@@ -58,16 +75,17 @@
                     Result
                 </h4>
                 <h2 id="gpio-value" style="text-align: center">
-                    Unknown
+                    {{ currentValue }}
                 </h2>
                 <h4 class="ui horizontal divider header">
                     <i class="settings icon"></i>
                     Configuration
                 </h4>
-                <form class="ui form" action="/gpio_in" method="get" enctype="multipart/form-data">
+                <form class="ui form" action="#" method="get" enctype="multipart/form-data">
                     <div class="field">
                         <label>Choose a GPIO pin: </label>
-                        <select name="pin">
+                        <select name="pin" v-model="pin">
+                            <option disabled value="">Pick a pin</option>
                             <option value="0">Pin 0</option>
                             <option value="39">Pin 39</option>
                             <option value="40">Pin 40</option>
@@ -75,7 +93,9 @@
                             <option value="42">Pin 42</option>
                         </select>
                     </div>
-                    <input type="submit" value="Go">
+                    <div class="field">
+                        <input class="fluid ui button" type="submit" value="Go" v-on:click="gpioGet">
+                    </div>
                 </form>
             </div>
         </div>

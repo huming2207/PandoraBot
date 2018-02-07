@@ -101,7 +101,6 @@ def run_openocd():
             file_list.append(os.path.join(Settings.get("ocd_config_location"), secure_filename(ocd_config.filename)))
 
         ocd_thread = Thread(target=ToolRunner.start_openocd, args=(file_list, True))
-
         ocd_thread.start()
 
         return render_template("ocd_run.html")
@@ -109,20 +108,14 @@ def run_openocd():
     elif request.method == "GET" and request.args.get("ocd-cmd", default="") == "kill":
 
         ToolRunner.kill_process("openocd")
-        return Response(
-            status=200,
-            content_type="text/html",
-            response="<script>alert('OpenOCD has been terminated.'); window.location.replace('/');</script>")
+        return jsonify(status="OK", message="OpenOCD has been terminated.")
 
 
 @app.route("/uart", methods=["GET"])
 def run_uart():
     if request.args.get("uart-cmd", default="") == "kill":
         ToolRunner.kill_process("ttyd")
-        return Response(
-            status=200,
-            content_type="text/html",
-            response="<script>alert('ttyd has been terminated.'); window.location.replace('/');</script>")
+        return jsonify(status="OK", message="ttyd has been terminated.")
     else:
         data = str(request.args.get("data", default=""))
         parity = str(request.args.get("parity", default=""))
@@ -149,24 +142,18 @@ def handle_gpio_out():
 
     # Pin selection
     if not str(request.args.get("pin", default="")).isdigit():
-        return Response(status=400,
-                        content_type="text/plain",
-                        response="Bad Request, pin argument is not even a number")
+        return jsonify(status="PARAM_ERR", message="Bad Request, pin argument is not even a number")
 
     selected_pin = int(request.args.get("pin"))
 
     # FIXME: use regexp later
     # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
     if not selected_pin == 0 and not 39 <= selected_pin <= 42:
-        return Response(status=400,
-                        content_type="text/plain",
-                        response="Bad Request: not a valid pin number")
+        return jsonify(status="PARAM_ERR", message="Bad Request: not a valid pin number")
 
     # Value selection
     if not str(request.args.get("value")).isdigit():
-        return Response(status=400,
-                        content_type="text/plain",
-                        response="Bad Request: value selection incorrect")
+        return jsonify(status="PARAM_ERR", message="Bad Request: value selection incorrect")
 
     value = int(request.args.get("value", default="-1"))
 
@@ -174,48 +161,39 @@ def handle_gpio_out():
     gpio = Gpio(selected_pin, app)
 
     if not gpio.set_mode("out"):
-        return Response(status=500,
-                        content_type="text/plain",
-                        response="Internal Error: set mode failed, check dmesg log please")
+        return jsonify(status="INTERNAL_ERR", message="Internal Error: set mode failed, check dmesg log please")
 
     if not gpio.set_value(value):
-        return Response(status=500,
-                        content_type="text/plain",
-                        response="Internal Error: set value failed, check dmesg log please")
+        return jsonify(status="INTERNAL_ERR", message="Internal Error: set value failed, check dmesg log please")
 
-    return Response(status=200, content_type="text/plain", response="OK")
-
+    return jsonify(status="OK", message="OK")
 
 
 @app.route("/gpio_in", methods=["GET"])
 def handle_gpio_in():
     # Pin selection
     if not str(request.args.get("pin", default="")).isdigit():
-        return Response(status=400, content_type="text/plain",
-                        response="Bad Request, pin argument is not even a number")
+        return jsonify(status="PARAM_ERR", message="Bad Request, pin argument is not even a number")
 
     selected_pin = int(request.args.get("pin"))
 
     # FIXME: use regexp later
     # Selected pin must be 0, 14-17 (used by soft SPI), 39 to 42, or it should return 400 to block this request
     if not selected_pin == 0 and not 39 <= selected_pin <= 42:
-        return Response(status=400, content_type="text/plain", response="Bad Request: not a valid pin number")
+        return jsonify(status="PARAM_ERR", message="Bad Request: not a valid pin number")
 
     # If all good, then...
     gpio = Gpio(selected_pin, app)
 
     if not gpio.set_mode("in"):
-
-        return Response(status=500,
-                        content_type="text/plain",
-                        response="Internal Error: set mode failed, check dmesg log please")
+        return jsonify(status="INTERNAL_ERR", message="Internal Error: set mode failed, check dmesg log please")
 
     gpio_value = gpio.get_value()
 
     if gpio_value == -1:
-            return Response(status=400, content_type="text/plain", response="Bad Request: cannot retrieve value")
+        return jsonify(status="INTERNAL_ERR", message="Internal Error: cannot read GPIO value")
     else:
-        return Response(status=200, content_type="text/plain", response=str(gpio_value))
+        return jsonify(status="OK", message=str(gpio_value))
 
 
 # Shorten caching timeout to 10 seconds
